@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Profile — Supplier Portal</title>
+  <link rel="stylesheet" href="../theme.css">
+  <link rel="stylesheet" href="../design-system.css">
+  <link rel="stylesheet" href="../admin/admin.css">
+  <!-- A3: Supplier Portal UI layer (admin.css is shared with admin/ and super-admin/) -->
+  <link rel="stylesheet" href="vendor-ui.css">
+</head>
+
+<body class="bf-admin-body">
+
+  <div class="bf-admin-shell">
+
+    <aside class="bf-admin-sidebar">
+      <div class="bf-admin-sidebar-brand">
+        <img src="../bestify-logo.jpeg" alt="Bestify" class="bf-admin-logo-img">
+        <span class="bf-admin-brand-text">Supplier Portal</span>
+      </div>
+
+      <nav class="bf-admin-nav">
+        <button class="bf-admin-nav-item" onclick="location.href='dashboard.html'">📊<span>Dashboard</span></button>
+        <button class="bf-admin-nav-item" onclick="location.href='products.html'">📦<span>My Products</span></button>
+        <button class="bf-admin-nav-item" onclick="location.href='orders.html'">🧾<span>My Orders</span></button>
+        <button class="bf-admin-nav-item" onclick="location.href='earnings.html'">🧮<span>Earnings</span></button>
+        <button class="bf-admin-nav-item" onclick="location.href='withdraw.html'">💸<span>Withdraw</span></button>
+        <button class="bf-admin-nav-item bf-admin-nav-active" onclick="location.href='profile.html'">🏪<span>Shop Profile</span></button>
+      </nav>
+    </aside>
+
+    <div class="bf-admin-main-col">
+
+      <header class="bf-admin-header">
+        <div class="bf-admin-header-title">
+          <span class="bf-admin-header-brand">Bestify</span>
+          <span class="bf-admin-header-label">Shop Profile</span>
+        </div>
+        <button type="button" id="logoutBtn" class="bf-btn bf-btn-ghost bf-btn-sm">🚪 Logout</button>
+      </header>
+
+      <main class="bf-admin-content">
+
+        <section class="bf-admin-welcome">
+          <h1>Shop Profile</h1>
+          <p class="bf-admin-welcome-sub">How your shop appears to Bestify and customers.</p>
+        </section>
+
+        <div class="bf-vd-kpis bf-vd-kpis-2" style="max-width:720px;">
+          <div class="bf-card bf-vd-kpi">
+            <span class="bf-vd-kpi-label">🏷️ Commission Rate</span>
+            <span id="commissionRateLabel" class="bf-vd-kpi-value bf-skeleton" data-vd-fill></span>
+            <span class="bf-vd-kpi-foot">Set by Bestify</span>
+          </div>
+          <div class="bf-card bf-vd-kpi">
+            <span class="bf-vd-kpi-label">🛡️ Account Status</span>
+            <span><span id="statusLabel" class="bf-status-pill bf-status-success">Active</span></span>
+            <span class="bf-vd-kpi-foot">Only Bestify can change this</span>
+          </div>
+        </div>
+
+        <div class="bf-card bf-vd-section" style="max-width:720px;">
+
+          <form id="profileForm" novalidate aria-busy="true">
+
+            <fieldset class="bf-vd-fieldset">
+              <legend>Shop</legend>
+              <div class="bf-vd-form-row bf-vd-form-row-2">
+                <div class="bf-field">
+                  <label class="bf-label" for="shopName">Shop Name</label>
+                  <input type="text" id="shopName" class="bf-input" required autocomplete="organization">
+                  <p class="bf-error-text bf-hidden" data-err-for="shopName"></p>
+                </div>
+                <div class="bf-field">
+                  <label class="bf-label" for="vendorCategory">Category</label>
+                  <input type="text" id="vendorCategory" class="bf-input" required placeholder="e.g. Mobile Accessories">
+                  <p class="bf-error-text bf-hidden" data-err-for="vendorCategory"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="bf-vd-fieldset">
+              <legend>Owner &amp; contact</legend>
+              <div class="bf-field">
+                <label class="bf-label" for="ownerName">Owner Name</label>
+                <input type="text" id="ownerName" class="bf-input" required autocomplete="name">
+                <p class="bf-error-text bf-hidden" data-err-for="ownerName"></p>
+              </div>
+              <div class="bf-vd-form-row bf-vd-form-row-2">
+                <div class="bf-field">
+                  <label class="bf-label" for="vendorPhone">Phone Number</label>
+                  <input type="tel" id="vendorPhone" class="bf-input" required inputmode="numeric" autocomplete="tel">
+                  <p class="bf-error-text bf-hidden" data-err-for="vendorPhone"></p>
+                </div>
+                <div class="bf-field">
+                  <label class="bf-label" for="vendorEmail">Email</label>
+                  <input type="email" id="vendorEmail" class="bf-input" required autocomplete="email">
+                  <p class="bf-error-text bf-hidden" data-err-for="vendorEmail"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="bf-vd-fieldset">
+              <legend>Address</legend>
+              <div class="bf-field">
+                <label class="bf-label" for="vendorAddress">Shop Address</label>
+                <textarea id="vendorAddress" class="bf-textarea" required autocomplete="street-address"></textarea>
+                <p class="bf-error-text bf-hidden" data-err-for="vendorAddress"></p>
+              </div>
+            </fieldset>
+
+            <button type="submit" id="saveProfileBtn" class="bf-btn bf-btn-primary bf-btn-block">
+              Save Changes
+            </button>
+
+          </form>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="profile.js"></script>
+  <!-- A3: shared portal UI (drawer, profile menu, Esc). No Firestore. -->
+  <script type="module" src="vendor-ui.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,609 @@
+/* ============================================================
+   Bestify Supplier Portal — UI layer (A3 Part 1)
+
+   Loaded ONLY by the pages in vendor/, after ../admin/admin.css.
+   admin.css is shared with the Admin panel and Super Admin panel,
+   so it is not edited; everything here applies to the Supplier
+   Portal alone. No new tokens — every colour, radius, shadow and
+   font comes from theme.css / design-system.css. Vendor-specific
+   classes use the "bf-vd-" prefix.
+
+   Sections
+     1. Sticky header fix (overflow)
+     2. theme.css global resets (buttons only)
+     3. Mobile drawer + sidebar
+     4. Header + profile menu
+     5. Page heading, cards, inputs, badges
+     6. Dashboard
+     7. Loading / empty / error states
+     8. Modals + toasts
+     9. Breakpoints
+   ============================================================ */
+
+/* ---------- 1. Sticky header fix ----------
+   admin.css sets overflow-x:hidden on <html> and <body>, which turns
+   <body> into its own scroll box, so the sticky header and sidebar
+   scroll away. overflow-x:clip still stops sideways scrolling without
+   creating a scroll box. (Same fix as the Admin panel, vendor only.) */
+html:has(> body.bf-admin-body),
+body.bf-admin-body{ overflow-x: clip; }
+
+/* ---------- 2. theme.css globals ----------
+   theme.css draws every <button> full-width with a top margin (right
+   for the store's login pages). :where() keeps this at element level
+   so every existing class on the vendor pages still wins. */
+:where(body.bf-admin-body) button{ width: auto; margin-top: 0; }
+body.bf-admin-body .bf-btn{ white-space: nowrap; }
+body.bf-admin-body .bf-btn:hover:not(:disabled){ transform: none; }
+body.bf-admin-body .bf-btn-block{ width: 100%; }
+
+/* ---------- 3. Sidebar + mobile drawer ---------- */
+body.bf-admin-body .bf-admin-nav-item{ width: 100%; gap: 12px; }
+body.bf-admin-body .bf-admin-nav-item:focus-visible{
+  outline: 2px solid var(--marigold, #F2A93B);
+  outline-offset: -2px;
+}
+body.bf-admin-body .bf-admin-nav-item.bf-admin-nav-active{
+  box-shadow: inset 3px 0 0 var(--ink, #14213D);
+}
+body.bf-admin-body .bf-admin-sidebar{
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251,247,240,.25) transparent;
+}
+body.bf-admin-body .bf-admin-hamburger{ width: 44px; flex-shrink: 0; }
+
+.bf-vd-drawer-close{
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--paper, #FBF7F0);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.bf-vd-drawer-close:hover{ background: rgba(251,247,240,.1); }
+
+/* "Supplier" tag under the brand, same notched price-tag shape the
+   store uses for prices — tells vendors which portal they're in. */
+.bf-vd-tier{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 18px 4px;
+  padding: 4px 12px 4px 7px;
+  border-radius: 999px 6px 6px 999px;
+  background: var(--marigold, #F2A93B);
+  color: var(--ink, #14213D);
+  font-family: var(--font-display, sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  align-self: flex-start;
+}
+.bf-vd-tier::before{
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ink, #14213D);
+}
+
+/* ---------- 4. Header + profile menu ---------- */
+body.bf-admin-body .bf-admin-header{
+  box-shadow: 0 1px 0 var(--line, #E4DED2);
+  gap: 10px;
+}
+body.bf-admin-body .bf-admin-header-title{ min-width: 0; }
+
+.bf-vd-header-actions{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.bf-vd-menu-wrap{ position: relative; }
+.bf-vd-menu a{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 8px);
+  color: var(--ink, #14213D);
+  text-decoration: none;
+  font-size: 14px;
+}
+.bf-vd-menu a:hover{ background: var(--paper-dim, #F2ECE0); }
+.bf-vd-menu-who{
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--line, #E4DED2);
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--ink-soft, #3A4A6B);
+  overflow-wrap: anywhere;
+}
+.bf-vd-menu-who strong{ display: block; color: var(--ink, #14213D); font-size: 14px; }
+/* The page's own Log out button, moved into the menu by vendor-ui.js */
+.bf-vd-menu #logoutBtn{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  border: none;
+  border-top: 1px solid var(--line, #E4DED2);
+  border-radius: 0 0 var(--radius-sm, 8px) var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--bf-danger, #C1442D);
+  font-weight: 600;
+  padding: 10px 12px;
+}
+.bf-vd-menu #logoutBtn:hover{ background: var(--bf-danger-bg, #FBE9E5); }
+
+/* ---------- 5. Page heading, cards, inputs, badges ---------- */
+body.bf-admin-body .bf-admin-welcome h1{
+  font-family: var(--font-display, sans-serif);
+  font-size: 24px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+body.bf-admin-body .bf-admin-welcome-sub{ max-width: 62ch; line-height: 1.45; }
+body.bf-admin-body .bf-admin-content .bf-card{ min-width: 0; }
+body.bf-admin-body .bf-admin-content .bf-card :is(div, span, p, a, strong):not(.bf-badge):not(.bf-status-pill):not(.bf-btn){
+  overflow-wrap: anywhere;
+}
+body.bf-admin-body .bf-admin-content .bf-input,
+body.bf-admin-body .bf-admin-content .bf-select{ background: var(--card, #fff); }
+body.bf-admin-body .bf-admin-content :is(.bf-badge, .bf-status-pill){ white-space: nowrap; flex-shrink: 0; }
+body.bf-admin-body .bf-admin-content img{ max-width: 100%; }
+
+/* ---------- 6. Dashboard ---------- */
+.bf-vd-kpis{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.bf-vd-kpi{
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.bf-vd-kpi-label{
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft, #3A4A6B);
+}
+.bf-vd-kpi-value{
+  font-family: var(--font-mono, monospace);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--ink, #14213D);
+  line-height: 1.15;
+  min-height: 24px;
+  overflow-wrap: anywhere;
+}
+.bf-vd-kpi-value.bf-skeleton{ width: 70%; height: 24px; }
+.bf-vd-kpi-foot{ font-size: 12px; color: var(--ink-soft, #3A4A6B); }
+
+.bf-vd-grid{ display: grid; gap: 16px; }
+.bf-vd-section{ padding: 18px; }
+.bf-vd-section-head{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+.bf-vd-section-head h2{
+  font-family: var(--font-display, sans-serif);
+  font-size: 17px;
+  margin: 0;
+}
+.bf-vd-section-head a{
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--marigold-deep, #D98925);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Recent orders */
+.bf-vd-orders{ list-style: none; margin: 0; padding: 0; }
+.bf-vd-orders li + li{ border-top: 1px solid var(--line, #E4DED2); }
+.bf-vd-order{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.bf-vd-order-main{ flex: 1; min-width: 0; }
+.bf-vd-order-no{ font-weight: 700; font-size: 14px; }
+.bf-vd-order-sub{ font-size: 12px; color: var(--ink-soft, #3A4A6B); margin-top: 2px; }
+.bf-vd-order-side{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.bf-vd-amount{ font-family: var(--font-mono, monospace); font-weight: 600; white-space: nowrap; }
+
+/* Wallet card */
+.bf-vd-wallet{
+  background: var(--ink, #14213D);
+  color: var(--paper, #FBF7F0);
+  border-color: var(--ink, #14213D);
+}
+.bf-vd-wallet .bf-vd-section-head h2{ color: var(--paper, #FBF7F0); }
+.bf-vd-wallet .bf-vd-section-head a{ color: var(--marigold, #F2A93B); }
+.bf-vd-wallet-balance{
+  font-family: var(--font-mono, monospace);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--marigold, #F2A93B);
+  min-height: 32px;
+}
+.bf-vd-wallet-note{ font-size: 13px; opacity: .8; margin: 6px 0 14px; line-height: 1.45; }
+.bf-vd-wallet .bf-btn-ghost{
+  color: var(--paper, #FBF7F0);
+  border-color: rgba(251,247,240,.35);
+  background: transparent;
+}
+.bf-vd-wallet .bf-btn-ghost:hover:not(:disabled){ background: rgba(251,247,240,.1); }
+
+.bf-vd-actions{ display: grid; gap: 8px; }
+.bf-vd-actions .bf-btn{ width: 100%; justify-content: flex-start; }
+.bf-vd-wallet-actions{ display: flex; gap: 8px; flex-wrap: wrap; }
+.bf-vd-wallet-actions .bf-btn{ flex: 1 1 130px; }
+
+/* ---------- 6b. Content pages (A3 Part 2) ---------- */
+
+/* theme.css draws every <form> as a card; on these pages the form
+   already sits inside its own card. */
+:where(body.bf-admin-body) form{
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.bf-vd-muted{ color: var(--ink-soft, #3A4A6B); font-size: 13px; font-weight: 400; }
+.bf-vd-hint{ font-size: 12px; color: var(--ink-soft, #3A4A6B); margin: 6px 0 0; line-height: 1.45; }
+.bf-vd-good{ color: var(--leaf, #2F7A4F); }
+.bf-vd-warn{ color: var(--marigold-deep, #D98925); }
+.bf-vd-bad{ color: var(--bf-danger, #C1442D); }
+
+/* Search + filter bar */
+.bf-vd-toolbar{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.bf-vd-toolbar > .bf-input{ flex: 1 1 220px; min-width: 0; }
+.bf-vd-toolbar > .bf-select{ flex: 0 1 190px; }
+.bf-vd-date{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 150px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft, #3A4A6B);
+}
+.bf-vd-date .bf-input{ flex: 1; min-width: 0; }
+
+.bf-vd-count{ font-weight: 700; font-size: 14px; margin: 0 0 12px; }
+.bf-vd-count-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.bf-vd-count-row .bf-vd-count{ margin: 0; }
+
+.bf-vd-list{ display: flex; flex-direction: column; gap: 10px; }
+
+/* Tabs (Earnings) */
+.bf-vd-tabs{ display: flex; gap: 8px; margin-bottom: 14px; }
+.bf-vd-tabs .ve-tab{ flex: 1 1 0; min-height: 42px; }
+.bf-vd-tabs .ve-tab.active{
+  background: var(--ink, #14213D);
+  border-color: var(--ink, #14213D);
+  color: var(--paper, #FBF7F0);
+}
+
+/* Generic list row (earnings, wallet history, withdrawals) */
+.bf-vd-row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.bf-vd-row-main{ flex: 1; min-width: 0; }
+.bf-vd-row-title{ font-weight: 700; font-size: 14px; }
+.bf-vd-row-sub{ font-size: 12px; color: var(--ink-soft, #3A4A6B); margin-top: 3px; line-height: 1.4; }
+.bf-vd-row-side{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.bf-vd-row-icon{
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.bf-vd-row-in{ background: var(--bf-success-bg, #E4F2EA); color: var(--leaf, #2F7A4F); }
+.bf-vd-row-out{ background: var(--bf-danger-bg, #FBE9E5); color: var(--bf-danger, #C1442D); }
+
+/* Order cards */
+.bf-vd-order-card{ padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.bf-vd-order-head{ display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.bf-vd-order-customer{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: var(--ink-soft, #3A4A6B);
+}
+.bf-vd-order-customer a{ color: inherit; text-decoration: none; font-weight: 600; }
+.bf-vd-order-where{ flex-basis: 100%; }
+.bf-vd-items{
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--line, #E4DED2);
+}
+.bf-vd-item{ display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.bf-vd-item-img{
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--paper-dim, #F2ECE0);
+}
+.bf-vd-item-img-empty{ display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.bf-vd-item-main{ flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bf-vd-item-name{ font-size: 14px; font-weight: 600; }
+.bf-vd-item-sub{ font-size: 12px; color: var(--ink-soft, #3A4A6B); }
+.bf-vd-order-foot{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line, #E4DED2);
+  font-size: 13px;
+}
+.bf-vd-order-card .advance-status-btn{ align-self: flex-start; }
+
+/* Product cards */
+.bf-vd-product-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.bf-vd-product{ padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.bf-vd-product-off .bf-vd-product-img{ opacity: .55; }
+.bf-vd-product-img{
+  aspect-ratio: 1 / 1;
+  background: var(--paper-dim, #F2ECE0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+}
+.bf-vd-product-img img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.bf-vd-product-body{ padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.bf-vd-product-name{ font-weight: 700; font-size: 14px; line-height: 1.3; }
+.bf-vd-product-price{ display: flex; align-items: baseline; gap: 8px; font-size: 15px; }
+.bf-vd-pills{ display: flex; gap: 6px; flex-wrap: wrap; }
+.bf-vd-reject{ font-size: 12px; color: var(--bf-danger, #C1442D); }
+.bf-vd-stock{ display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: wrap; }
+.bf-vd-stock strong{ min-width: 26px; text-align: center; font-family: var(--font-mono, monospace); }
+.bf-vd-step{
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1.5px solid var(--line, #E4DED2);
+  background: var(--card, #fff);
+  color: var(--ink, #14213D);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.bf-vd-step:hover{ background: var(--paper-dim, #F2ECE0); }
+.bf-vd-step:focus-visible{ box-shadow: var(--bf-focus-ring); outline: none; }
+.bf-vd-product-actions{ display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+.bf-vd-product-actions .bf-btn{ flex: 1 1 0; }
+
+/* Product form modal */
+.bf-vd-modal-wide{ max-width: 620px; }
+.bf-vd-form-row{ display: grid; gap: 0 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bf-vd-form-row-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bf-vd-file{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1.5px dashed var(--marigold-deep, #D98925);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bf-warning-bg, #FBF1DD);
+  color: var(--ink, #14213D);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.bf-vd-file input{ position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.bf-vd-file:focus-within{ box-shadow: var(--bf-focus-ring); }
+.bf-vd-preview-row{ display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.bf-vd-thumb{
+  position: relative;
+  width: 68px; height: 68px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line, #E4DED2);
+}
+.bf-vd-thumb-main{ border: 2px solid var(--marigold-deep, #D98925); }
+.bf-vd-thumb img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.bf-vd-thumb button{
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(20,33,61,.75);
+  color: #fff;
+  font-size: 11px;
+  line-height: 22px;
+  padding: 0;
+  cursor: pointer;
+}
+.bf-vd-thumb-tag{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(20,33,61,.7);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  padding: 1px 0;
+}
+
+/* Profile form */
+.bf-vd-fieldset{ border: none; padding: 0; margin: 0 0 18px; min-width: 0; }
+.bf-vd-fieldset legend{
+  font-family: var(--font-display, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 0;
+}
+.bf-vd-kpis-2{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+form[aria-busy="true"] .bf-input,
+form[aria-busy="true"] .bf-textarea{
+  background: linear-gradient(90deg, var(--paper-dim, #F2ECE0) 25%, var(--line, #E4DED2) 37%, var(--paper-dim, #F2ECE0) 63%);
+  background-size: 400% 100%;
+  animation: bf-shimmer 1.4s ease infinite;
+  color: transparent;
+  pointer-events: none;
+}
+form[aria-busy="true"] button[type="submit"]{ opacity: .5; pointer-events: none; }
+
+/* Withdraw layout */
+.bf-vd-withdraw .bf-vd-section-head h2{ font-size: 16px; }
+
+/* ---------- 7. Loading / empty / error states ---------- */
+.bf-vd-skeleton-rows{ display: grid; gap: 10px; }
+.bf-vd-state{ margin-bottom: 20px; }
+
+/* One-line message cards the pages print into their lists ("No
+   orders found.", "❌ Unable to load earnings.", "Loading…") are
+   tagged by vendor-ui.js and drawn like design-system .bf-state. */
+body.bf-admin-body .bf-vd-ui-state{
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 30px 20px !important;
+  text-align: center;
+  color: var(--ink-soft, #3A4A6B);
+  font-size: 14px;
+  line-height: 1.45;
+  grid-column: 1 / -1;
+}
+body.bf-admin-body .bf-vd-ui-state::before{ font-size: 30px; line-height: 1; }
+body.bf-admin-body .bf-vd-ui-state-empty::before{ content: "🗂️"; }
+body.bf-admin-body .bf-vd-ui-state-error{
+  border-color: var(--bf-danger, #C1442D) !important;
+  background: var(--bf-danger-bg, #FBE9E5) !important;
+  color: var(--bf-danger, #C1442D);
+  font-weight: 600;
+}
+body.bf-admin-body .bf-vd-ui-state-error::before{ content: "⚠️"; }
+body.bf-admin-body .bf-vd-ui-state-loading::before{
+  content: "";
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--line, #E4DED2);
+  border-top-color: var(--marigold, #F2A93B);
+  animation: bf-vd-spin .8s linear infinite;
+}
+body.bf-admin-body .bf-vd-ui-own-icon:not(.bf-vd-ui-state-loading)::before{ content: none; }
+@keyframes bf-vd-spin{ to{ transform: rotate(360deg); } }
+body.bf-admin-body .bf-vd-ui-stale{ display: none !important; }
+
+/* ---------- 8. Modals + toasts ---------- */
+body.bf-admin-body .bf-modal{
+  padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+body.bf-admin-body .bf-modal-close{
+  width: 40px;
+  height: 40px;
+  top: 8px;
+  right: 8px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.bf-admin-body .bf-modal-close:hover{ background: var(--paper-dim, #F2ECE0); }
+body.bf-admin-body .bf-modal-title{ padding-right: 40px; }
+/* design-system.css lifts toasts 90px for the store's bottom nav. The
+   portal has no bottom nav but does have bottom-sheet modals on phones,
+   so toasts sit just under the header instead. */
+body.bf-admin-body .bf-toast-container{ top: 72px; bottom: auto; }
+
+/* ---------- 9. Breakpoints ---------- */
+@media (max-width: 767px){
+  body.bf-admin-body .bf-admin-content{ padding: 18px 14px 40px; }
+  body.bf-admin-body .bf-admin-header-brand{ font-size: 14px; }
+}
+
+@media (max-width: 479px){
+  .bf-vd-form-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bf-vd-form-row > .bf-field:last-child:nth-child(3){ grid-column: 1 / -1; }
+  .bf-vd-form-row-2{ grid-template-columns: 1fr; }
+  /* Phones: one product per row, photo on the left, so the stock
+     stepper and both buttons fit on one line each. */
+  .bf-vd-product-grid{ grid-template-columns: 1fr; gap: 10px; }
+  .bf-vd-product{ flex-direction: row; }
+  .bf-vd-product-img{ width: 104px; flex-shrink: 0; aspect-ratio: auto; align-self: stretch; }
+  .bf-vd-product-body{ padding: 10px 12px; min-width: 0; }
+  .bf-vd-toolbar > .bf-select{ flex: 1 1 100%; }
+  .bf-vd-order-card .advance-status-btn{ align-self: stretch; }
+}
+
+@media (min-width: 768px){
+  .bf-vd-kpis{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bf-vd-kpis-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px){
+  .bf-vd-drawer-close{ display: none; }
+  body.bf-admin-body .bf-admin-sidebar{ height: 100vh; top: 0; }
+  body.bf-admin-body .bf-admin-welcome h1{ font-size: 28px; }
+  .bf-vd-grid{ grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+  .bf-vd-kpi-value{ font-size: 23px; }
+}
+
+@media (min-width: 1280px){
+  .bf-vd-kpis{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.bf-admin-body .bf-admin-sidebar{ transition: none; }
+}
