@@ -1,0 +1,340 @@
+/* ============================================================
+   Bestify Admin — UI layer (A2)
+
+   Loaded ONLY by the pages in admin/, after admin.css.
+   admin.css itself is shared with the Vendor portal and the Super
+   Admin panel, so it is not edited; everything here applies to the
+   Admin panel alone. No new tokens: every colour, radius, shadow and
+   font comes from theme.css / design-system.css.
+
+   Sections
+     1. Sticky header fix (overflow)
+     2. Global-rule resets from theme.css
+     3. Sidebar + mobile drawer
+     4. Header actions (bell, profile) added by admin-ui.js
+     5. Page heading
+     6. Summary / KPI cards
+     7. Filters, search, lists
+     8. Modals
+     9. Toasts
+    10. Breakpoints
+   ============================================================ */
+
+/* ---------- 1. Sticky header fix ----------
+   admin.css sets overflow-x:hidden on <html> and <body>. With both
+   set, <body> becomes its own scroll box and the sticky header and
+   sidebar scroll away. overflow-x:clip still prevents sideways
+   scrolling but doesn't create a scroll box. */
+html:has(> body.bf-admin-body),
+body.bf-admin-body{ overflow-x: clip; }
+
+/* ---------- 2. Undo theme.css globals that fight the admin UI ----------
+   theme.css draws every <button> full-width and every <form> as a
+   card (right for the store's login pages, wrong inside panels).
+   :where() keeps these at element-level specificity, so any class —
+   bf-, hop- or the products page's utility classes — still wins. */
+:where(body.bf-admin-body) button{ width: auto; margin-top: 0; }
+:where(body.bf-admin-body) form{
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+body.bf-admin-body .bf-btn{ white-space: nowrap; }
+body.bf-admin-body .bf-btn:hover:not(:disabled){ transform: none; }
+
+/* ---------- 3. Sidebar + mobile drawer ---------- */
+body.bf-admin-body .bf-admin-sidebar{
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251,247,240,.25) transparent;
+}
+body.bf-admin-body .bf-admin-nav-item,
+body.bf-admin-body .bf-admin-nav-subitem{ gap: 12px; }
+body.bf-admin-body .bf-admin-nav-item:focus-visible,
+body.bf-admin-body .bf-admin-nav-subitem:focus-visible{
+  outline: 2px solid var(--marigold, #F2A93B);
+  outline-offset: -2px;
+}
+body.bf-admin-body .bf-admin-nav-item.bf-admin-nav-active{
+  box-shadow: inset 3px 0 0 var(--ink, #14213D);
+}
+
+.bf-admin-drawer-close{
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--paper, #FBF7F0);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.bf-admin-drawer-close:hover{ background: rgba(251,247,240,.1); }
+
+/* ---------- 4. Header ---------- */
+body.bf-admin-body .bf-admin-header{
+  box-shadow: 0 1px 0 var(--line, #E4DED2);
+  gap: 10px;
+}
+body.bf-admin-body .bf-admin-header > .bf-btn{ flex-shrink: 0; }
+body.bf-admin-body .bf-admin-header-title{ min-width: 0; }
+
+.bf-admin-ui-actions{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.bf-admin-ui-menu-wrap{ position: relative; }
+a.bf-admin-icon-btn{ text-decoration: none; color: inherit; }
+.bf-admin-ui-menu a{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 8px);
+  color: var(--ink, #14213D);
+  text-decoration: none;
+  font-size: 14px;
+}
+.bf-admin-ui-menu a:hover{ background: var(--paper-dim, #F2ECE0); }
+.bf-admin-ui-menu-who{
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--line, #E4DED2);
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--ink-soft, #3A4A6B);
+  overflow-wrap: anywhere;
+}
+.bf-admin-ui-menu-who strong{ display: block; color: var(--ink, #14213D); font-size: 14px; }
+
+/* ---------- 5. Page heading ---------- */
+body.bf-admin-body .bf-admin-welcome h1{
+  font-family: var(--font-display, sans-serif);
+  font-size: 24px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+body.bf-admin-body .bf-admin-welcome-sub{ max-width: 62ch; line-height: 1.45; }
+
+/* ---------- 6. Summary / KPI cards ----------
+   Most pages render their stat cards into a "…Summary" container
+   with inline flex styles; lay them out as an even grid instead and
+   set the numbers in the mono face the store uses for prices. */
+body.bf-admin-body .bf-admin-content :is([id$="Summary"]:not(p), #reportKpis){
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px !important;
+  margin-bottom: 20px;
+}
+body.bf-admin-body .bf-admin-content :is([id$="Summary"]:not(p), #reportKpis) > .bf-card{
+  min-width: 0 !important;
+  padding: 14px !important;
+}
+body.bf-admin-body .bf-admin-content :is([id$="Summary"]:not(p), #reportKpis) > .bf-card > div:first-child{
+  font-size: 12px !important;
+  font-weight: 600;
+  color: var(--ink-soft, #3A4A6B);
+  opacity: 1 !important;
+}
+body.bf-admin-body .bf-admin-content :is([id$="Summary"]:not(p), #reportKpis) > .bf-card > div:last-child{
+  font-family: var(--font-mono, monospace);
+  font-weight: 600 !important;
+  overflow-wrap: anywhere;
+}
+
+/* Dashboard metric cards */
+body.bf-admin-body .bf-admin-metric-card{ padding: 16px; min-width: 0; }
+body.bf-admin-body .bf-admin-metric-value:not(.bf-skeleton){
+  width: auto;
+  height: auto;
+  font-family: var(--font-mono, monospace);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink, #14213D);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 7. Filters, search, lists ---------- */
+body.bf-admin-body .bf-admin-content .bf-input,
+body.bf-admin-body .bf-admin-content .bf-select{ background: var(--card, #fff); }
+body.bf-admin-body .bf-admin-content .bf-card{ min-width: 0; overflow-wrap: break-word; }
+body.bf-admin-body .bf-admin-content :is(.bf-badge, .bf-status-pill){ white-space: nowrap; overflow-wrap: normal; flex-shrink: 0; }
+body.bf-admin-body .bf-admin-content img{ max-width: 100%; }
+
+/* Long unbroken text (emails, UPI IDs, payment IDs) wraps inside its
+   card instead of pushing past the screen edge. Badges stay on one line. */
+body.bf-admin-body .bf-admin-content .bf-card :is(div, span, p, a, strong):not(.bf-badge):not(.bf-status-pill):not(.bf-btn){
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* Settings: banner / shop-photo rows wrap their buttons on small screens */
+body.bf-admin-body :is(#bannerListWrap, #shopPhotoListWrap) > .bf-card{ flex-wrap: wrap; }
+
+/* Payments: status pill + select + Apply stay together as one control */
+body.bf-admin-body #paymentsList > .bf-card > div:last-child{ flex-wrap: nowrap !important; }
+body.bf-admin-body #paymentsList .payment-status-select{ width: auto; min-width: 120px; }
+
+/* Card lists read as one column of rows with even spacing */
+body.bf-admin-body .bf-admin-content :is(#usersList, #ordersList, #paymentsList, #walletsList, #transactionsList,
+  #commissionsList, #cashbackList, #referralsList, #repairsList, #chatsList, #alertsList, #auditList,
+  #notificationsList, #feedbackList, #wdList, #refundsList){
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------- 7b. Loading / empty / error states ----------
+   Most pages print a one-line card ("No users found.", "❌ Unable to
+   load users.") into their list. admin-ui.js tags those cards with
+   the classes below so every page shows the same state design as
+   design-system.css .bf-state. Text comes from the page unchanged. */
+body.bf-admin-body .bf-admin-ui-state{
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px !important;
+  text-align: center;
+  color: var(--ink-soft, #3A4A6B);
+  font-size: 14px;
+  line-height: 1.45;
+}
+body.bf-admin-body .bf-admin-ui-state::before{
+  font-size: 30px;
+  line-height: 1;
+}
+body.bf-admin-body .bf-admin-ui-state-empty::before{ content: "🗂️"; }
+body.bf-admin-body .bf-admin-ui-state-error{
+  border-color: var(--bf-danger, #C1442D) !important;
+  background: var(--bf-danger-bg, #FBE9E5) !important;
+  color: var(--bf-danger, #C1442D);
+  font-weight: 600;
+}
+body.bf-admin-body .bf-admin-ui-state-error::before{ content: "⚠️"; }
+body.bf-admin-body .bf-admin-ui-state-loading::before{
+  content: "";
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--line, #E4DED2);
+  border-top-color: var(--marigold, #F2A93B);
+  animation: bf-admin-ui-spin .8s linear infinite;
+}
+@keyframes bf-admin-ui-spin{ to{ transform: rotate(360deg); } }
+body.bf-admin-body .bf-admin-ui-state-own-icon:not(.bf-admin-ui-state-loading)::before{ content: none; }
+/* A "Loading …" counter left behind after the list failed to load */
+body.bf-admin-body .bf-admin-ui-stale{ display: none !important; }
+/* A state card the page hides once data arrives stays hidden. */
+body.bf-admin-body .bf-admin-ui-state:is(.bf-hidden, [hidden], [style*="display: none"], [style*="display:none"]){ display: none !important; }
+
+
+/* ---------- 8. Modals ---------- */
+body.bf-admin-body .bf-modal{
+  padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+body.bf-admin-body .bf-modal-close{
+  width: 40px;
+  height: 40px;
+  top: 8px;
+  right: 8px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.bf-admin-body .bf-modal-close:hover{ background: var(--paper-dim, #F2ECE0); }
+body.bf-admin-body .bf-modal-title{ padding-right: 40px; }
+body.bf-admin-body .bf-modal .bf-error-text{ font-weight: 600; }
+
+/* Products page modals use Tailwind's z-50, which sits UNDER the sticky
+   admin header (z 500) and sidebar — the header covered the top of the
+   modal and blocked taps there. Put them on the same layer as every
+   other admin modal (design-system.css .bf-modal-overlay). */
+body.bf-admin-body :is(#edit-modal, #sales-modal){ z-index: 10000 !important; }
+
+/* Form modals: Cancel + Submit side by side (row added by admin-ui.js) */
+.bf-admin-ui-form-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.bf-admin-ui-form-actions > .bf-btn{
+  flex: 1 1 0;
+  width: auto;
+  margin: 0;
+}
+
+/* ---------- 9. Toasts ----------
+   design-system.css lifts toasts 90px for the store's bottom nav.
+   The admin panel has no bottom nav but does have bottom-sheet
+   modals on mobile, so toasts sit just under the header instead. */
+body.bf-admin-body .bf-toast-container{ top: 72px; bottom: auto; }
+
+/* ---------- 10. Breakpoints ---------- */
+@media (max-width: 767px){
+  body.bf-admin-body .bf-admin-content{ padding: 18px 14px 40px; }
+  body.bf-admin-body .bf-admin-content .bf-select{ max-width: none !important; }
+  body.bf-admin-body .bf-admin-content div[style*="flex-wrap"] > .bf-select{ flex: 1 1 140px; }
+  body.bf-admin-body .bf-admin-header-brand{ font-size: 14px; }
+  /* List cards that wrap their actions (repairs, chats, commissions…):
+     on phones, always put the details on their own line and the
+     status + buttons on the line below, so every card in a list has
+     the same shape instead of wrapping differently per name length. */
+  body.bf-admin-body .bf-admin-content .bf-card[style*="space-between"][style*="flex-wrap"] > div:first-child{
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  /* The menu (☰) already goes back to the dashboard on phones, and
+     the extra Back button squeezed the page title off the header. */
+  body.bf-admin-body .bf-admin-header > .bf-btn[aria-label="Back"]{ display: none; }
+}
+
+@media (min-width: 1180px){
+  /* Users are self-contained cards: two per row on wide screens */
+  body.bf-admin-body .bf-admin-content #usersList{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 767px){
+  body.bf-admin-body #paymentsList > .bf-card > div:last-child{ width: 100%; }
+  body.bf-admin-body #paymentsList .payment-status-select{ flex: 1 1 auto; max-width: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.bf-admin-body .bf-admin-ui-state-loading::before{ animation: none; }
+}
+
+@media (min-width: 768px){
+  body.bf-admin-body .bf-admin-content :is([id$="Summary"]:not(p), #reportKpis){
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+@media (min-width: 1024px){
+  /* Dashboard has 6 KPI cards: 3 per row instead of 4 + 2 */
+  body.bf-admin-body .bf-admin-metrics{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bf-admin-drawer-close{ display: none; }
+  body.bf-admin-body .bf-admin-sidebar{ height: 100vh; top: 0; }
+  body.bf-admin-body .bf-admin-welcome h1{ font-size: 28px; }
+}
+
+@media (min-width: 1280px){
+  body.bf-admin-body .bf-admin-metrics{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.bf-admin-body .bf-admin-sidebar{ transition: none; }
+}
